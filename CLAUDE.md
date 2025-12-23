@@ -217,6 +217,105 @@ Use Svelte's reactive bindings:
 <input bind:value={email} />
 ```
 
+## Git Workflow
+
+Git saves "checkpoints" of your code so you can go back if something breaks.
+
+### Daily Workflow
+
+```bash
+# 1. Check what changed
+git status
+
+# 2. Save your changes (create a checkpoint)
+git add .
+git commit -m "Add favorites button to materials page"
+
+# 3. Upload to GitHub (backup + share)
+git push
+```
+
+### Understanding Git Status
+
+```bash
+git status
+```
+
+This shows:
+- **Untracked files** - New files git doesn't know about yet
+- **Modified files** - Files you changed
+- **Staged files** - Files ready to be committed
+
+### Commit Messages
+
+Write what you did, not how:
+
+```bash
+# Good
+git commit -m "Add search filter to materials page"
+git commit -m "Fix login button not working on mobile"
+git commit -m "Update finish swatches to use larger images"
+
+# Not as helpful
+git commit -m "Update code"
+git commit -m "Fix bug"
+```
+
+### If Something Breaks
+
+```bash
+# See recent commits
+git log --oneline -5
+
+# Go back to the last commit (discard uncommitted changes)
+git checkout .
+
+# Go back to a specific commit (use hash from git log)
+git checkout abc1234
+```
+
+### Working with GitHub
+
+```bash
+# First time: Connect to GitHub
+git remote add origin https://github.com/YOUR_USERNAME/scs-explorer.git
+git push -u origin main
+
+# After that, just:
+git push
+```
+
+### Common Situations
+
+**"I want to save my work"**
+```bash
+git add .
+git commit -m "Describe what you did"
+```
+
+**"I broke something and want to undo"**
+```bash
+git checkout .
+```
+
+**"I want to see what I changed"**
+```bash
+git diff
+```
+
+**"The agent made changes, should I keep them?"**
+1. Run `git diff` to see what changed
+2. Test if it works
+3. If good: `git add . && git commit -m "Agent: added feature X"`
+4. If bad: `git checkout .` to undo
+
+### Tips
+
+- Commit often (after each working feature)
+- Push at end of each session (backup to GitHub)
+- Write commits you'll understand later
+- Don't be afraid to experiment - you can always undo
+
 ## Troubleshooting
 
 **TypeScript errors about $types or env vars:**
