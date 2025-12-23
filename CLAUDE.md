@@ -311,6 +311,74 @@ Use Svelte's reactive bindings:
 <input bind:value={email} />
 ```
 
+## Remembering Decisions Across Sessions (kn)
+
+**Problem:** AI assistants forget decisions from previous sessions. You end up re-explaining "we decided to use blue buttons" every time.
+
+**Solution:** `kn` saves decisions to a file that Cursor/agents can read.
+
+### Install kn
+
+```bash
+# Clone and build (one time)
+cd ~/Documents
+git clone https://github.com/dylanconlin/kn.git
+cd kn && go build -o ~/bin/kn ./cmd/kn
+
+# Initialize in your project
+cd /path/to/scs-explorer
+kn init
+```
+
+### Basic Commands
+
+```bash
+# Record a decision
+kn decide "use blue buttons for primary actions" --reason "matches SCS brand guidelines"
+
+# Record something you tried that didn't work
+kn tried "using localStorage for favorites" --failed "doesn't sync across devices"
+
+# Record an open question
+kn question "should we add dark mode?"
+
+# See what's already been decided about a topic
+kn context "buttons"
+
+# See recent decisions
+kn recent
+```
+
+### Using with Cursor
+
+When starting a new chat in Cursor, you can say:
+> "Run `kn context materials` to see what we've decided about the materials page"
+
+Or ask Cursor to record decisions:
+> "That worked! Record this decision with kn"
+
+### What to Record
+
+**Worth recording:**
+- Design decisions ("blue buttons", "card layout for materials")
+- Things that didn't work ("tried X, but it broke Y")
+- Constraints ("images must be under 500KB")
+
+**Not worth recording:**
+- How code works (that's what the code is for)
+- Temporary experiments
+- One-off fixes
+
+### The .kn Folder
+
+After `kn init`, your project has a `.kn/` folder:
+```
+.kn/
+└── entries.jsonl    # All your decisions (git-tracked)
+```
+
+This file gets committed to git, so your decisions travel with the code.
+
 ## Git Workflow
 
 Git saves "checkpoints" of your code so you can go back if something breaks.
