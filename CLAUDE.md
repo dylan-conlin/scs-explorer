@@ -107,6 +107,8 @@ bun install          # Install dependencies
 bun run dev          # Start dev server at http://localhost:5173
 ```
 
+> **Note:** If port 5173 is already in use, the server will automatically pick another port (5174, 5175, etc.). Check the terminal output to see which port it's using.
+
 ## Stack
 
 - **Framework:** SvelteKit 5 (Svelte 5 with runes)
@@ -324,6 +326,11 @@ Use Svelte's reactive bindings:
 ### Install kn
 
 ```bash
+# Create ~/bin folder and add to PATH (one time)
+mkdir -p ~/bin
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
 # Clone and build (one time)
 cd ~/Documents
 git clone https://github.com/dylanconlin/kn.git
@@ -481,6 +488,45 @@ git diff
 - Push at end of each session (backup to GitHub)
 - Write commits you'll understand later
 - Don't be afraid to experiment - you can always undo
+
+## When You're Ready: Browser Automation (Playwright MCP)
+
+Once you're comfortable with Cursor, you can add browser automation. This lets the AI:
+- Click buttons and fill forms on web pages
+- Test your app in a real browser
+- Scrape data from websites
+
+### Install Playwright MCP in Cursor
+
+1. Open Cursor
+2. Go to `Cursor Settings` → `MCP` → `Add new MCP Server`
+3. Name it: `playwright`
+4. Type: `command`
+5. Command: `npx @playwright/mcp@latest`
+6. Click Save
+
+### Using It
+
+Once installed, you can ask Cursor things like:
+- "Open my app at localhost:5173 and click the Materials link"
+- "Fill in the login form with test@example.com"
+- "Take a screenshot of the finishes page"
+- "Check if the search filter is working"
+
+The AI will control a real browser to do these things.
+
+### Example Prompts
+
+```
+"Go to localhost:5173/materials, search for 'aluminum', 
+and tell me how many results appear"
+
+"Open the login page, try signing up with a test email,
+and screenshot any errors"
+
+"Navigate through all three pages (materials, hardware, finishes)
+and check that images are loading"
+```
 
 ## Troubleshooting
 
