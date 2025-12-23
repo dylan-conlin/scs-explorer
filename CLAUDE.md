@@ -17,6 +17,9 @@ After it finishes, follow the instructions it prints to add brew to your PATH.
 ### 2. Install Development Tools
 
 ```bash
+# Node.js (needed for Claude Code)
+brew install node
+
 # Bun (JavaScript runtime, faster than Node)
 brew install oven-sh/bun/bun
 
@@ -57,6 +60,7 @@ fly auth login
 ### Verify Everything Works
 
 ```bash
+node --version     # Should print a version number
 bun --version      # Should print a version number
 git --version      # Should print a version number
 gh --version       # Should print a version number
@@ -64,41 +68,55 @@ fly version        # Should print a version number
 go version         # Should print a version number
 ```
 
-### 6. Install Cursor (AI-powered code editor)
+### 6. Install Claude Code (AI coding assistant)
 
-1. Download from [cursor.com](https://cursor.com)
-2. Open the `.dmg` and drag Cursor to Applications
-3. Open Cursor and sign in (free trial, then $20/mo)
+```bash
+# Install Claude Code globally
+npm install -g @anthropic-ai/claude-code
+```
 
-**Why Cursor?** It has AI built right into the editor - no terminal needed. You can:
-- **Cmd+K** - Highlight code, describe what you want changed
-- **Cmd+L** - Open chat panel to ask questions
-- **Cmd+I** - Generate code from a description
+The first time you run `claude`, it will open a browser to authenticate with your Anthropic account.
 
-### Using Cursor
+**Why Claude Code?** It's a terminal-based AI that can:
+- Read and edit files in your project
+- Run commands (like `bun run dev`)
+- Search your codebase to understand how things work
+- Make changes across multiple files at once
 
-**Ask questions about your code:**
-1. Press `Cmd+L` to open chat
-2. Type your question: "How do I add a button that saves this material to favorites?"
-3. Cursor will suggest code changes
+### Using Claude Code
 
-**Edit code with AI:**
-1. Highlight some code
-2. Press `Cmd+K`
-3. Describe what you want: "Make this button red and add a loading spinner"
-4. Press Enter to apply
+**Start Claude Code in your project:**
+```bash
+cd ~/Documents/scs-explorer
+claude
+```
 
-**Generate new code:**
-1. Put your cursor where you want new code
-2. Press `Cmd+I`
-3. Describe what you need: "Create a function that filters materials by thickness"
+**Talk to it like a person.** Just type what you want:
+- "run the dev server"
+- "show me the materials page code"
+- "add a search box to filter materials by name"
+- "why is the login button not working?"
+- "commit my changes with a good message"
 
-### Cursor Tips
+**Example conversation:**
+```
+You: add a favorites button to each material card
+Claude: [reads the code, makes changes, shows you what it did]
 
-- Be specific in your prompts ("add a search input that filters the materials list by name")
-- If the AI gets confused, try `@file` to reference specific files
-- Use `Cmd+Z` to undo if you don't like a change
-- The chat remembers context, so you can say "now make it also filter by category"
+You: make the button red when favorited
+Claude: [updates the code]
+
+You: test it by running the dev server
+Claude: [runs bun run dev]
+```
+
+### Claude Code Tips
+
+- Be specific ("add a search input that filters materials by name" not just "add search")
+- Ask it to explain things ("how does the materials page load data?")
+- Ask it to commit when you're happy with changes ("commit this with message: Add favorites button")
+- If something breaks, say "undo that" or ask it to fix the error
+- Say "run the dev server" to see your changes in the browser
 
 ## Quick Start
 
@@ -321,7 +339,7 @@ Use Svelte's reactive bindings:
 
 **Problem:** AI assistants forget decisions from previous sessions. You end up re-explaining "we decided to use blue buttons" every time.
 
-**Solution:** `kn` saves decisions to a file that Cursor/agents can read.
+**Solution:** `kn` saves decisions to a file that Claude Code can read.
 
 ### Install kn
 
@@ -360,12 +378,12 @@ kn context "buttons"
 kn recent
 ```
 
-### Using with Cursor
+### Using with Claude Code
 
-When starting a new chat in Cursor, you can say:
+When starting a new session, you can say:
 > "Run `kn context materials` to see what we've decided about the materials page"
 
-Or ask Cursor to record decisions:
+Or ask Claude Code to record decisions:
 > "That worked! Record this decision with kn"
 
 ### What to Record
@@ -488,45 +506,6 @@ git diff
 - Push at end of each session (backup to GitHub)
 - Write commits you'll understand later
 - Don't be afraid to experiment - you can always undo
-
-## When You're Ready: Browser Automation (Playwright MCP)
-
-Once you're comfortable with Cursor, you can add browser automation. This lets the AI:
-- Click buttons and fill forms on web pages
-- Test your app in a real browser
-- Scrape data from websites
-
-### Install Playwright MCP in Cursor
-
-1. Open Cursor
-2. Go to `Cursor Settings` → `MCP` → `Add new MCP Server`
-3. Name it: `playwright`
-4. Type: `command`
-5. Command: `npx @playwright/mcp@latest`
-6. Click Save
-
-### Using It
-
-Once installed, you can ask Cursor things like:
-- "Open my app at localhost:5173 and click the Materials link"
-- "Fill in the login form with test@example.com"
-- "Take a screenshot of the finishes page"
-- "Check if the search filter is working"
-
-The AI will control a real browser to do these things.
-
-### Example Prompts
-
-```
-"Go to localhost:5173/materials, search for 'aluminum', 
-and tell me how many results appear"
-
-"Open the login page, try signing up with a test email,
-and screenshot any errors"
-
-"Navigate through all three pages (materials, hardware, finishes)
-and check that images are loading"
-```
 
 ## Troubleshooting
 
