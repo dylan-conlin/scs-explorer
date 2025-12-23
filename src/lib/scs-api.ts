@@ -117,9 +117,11 @@ export async function getMaterials(options?: {
 	sku?: string;
 	page?: number;
 	perPage?: number;
+	fetch?: typeof globalThis.fetch;
 }): Promise<Material[]> {
+	const fetchFn = options?.fetch || globalThis.fetch;
 	const params = new URLSearchParams();
-	
+
 	if (options?.includeDatasheet) {
 		params.set('include_datasheet', 'true');
 	}
@@ -134,7 +136,7 @@ export async function getMaterials(options?: {
 	}
 
 	const url = `${BASE_URL}/materials${params.toString() ? '?' + params.toString() : ''}`;
-	const response = await fetch(url);
+	const response = await fetchFn(url);
 	
 	if (!response.ok) {
 		throw new Error(`Failed to fetch materials: ${response.status} ${response.statusText}`);
@@ -158,9 +160,11 @@ export async function getMaterialBySku(sku: string, includeDatasheet = true): Pr
 export async function getHardware(options?: {
 	page?: number;
 	perPage?: number;
+	fetch?: typeof globalThis.fetch;
 }): Promise<Hardware[]> {
+	const fetchFn = options?.fetch || globalThis.fetch;
 	const params = new URLSearchParams();
-	
+
 	if (options?.page) {
 		params.set('page', options.page.toString());
 	}
@@ -169,7 +173,7 @@ export async function getHardware(options?: {
 	}
 
 	const url = `${BASE_URL}/hardware${params.toString() ? '?' + params.toString() : ''}`;
-	const response = await fetch(url);
+	const response = await fetchFn(url);
 	
 	if (!response.ok) {
 		throw new Error(`Failed to fetch hardware: ${response.status} ${response.statusText}`);
@@ -182,8 +186,8 @@ export async function getHardware(options?: {
 /**
  * Get all finish options
  */
-export async function getFinishOptions(): Promise<FinishOption[]> {
-	const response = await fetch(`${BASE_URL}/finish_options`);
+export async function getFinishOptions(fetchFn: typeof globalThis.fetch = globalThis.fetch): Promise<FinishOption[]> {
+	const response = await fetchFn(`${BASE_URL}/finish_options`);
 	
 	if (!response.ok) {
 		throw new Error(`Failed to fetch finish options: ${response.status} ${response.statusText}`);
