@@ -60,6 +60,42 @@ gh --version       # Should print a version number
 fly version        # Should print a version number
 ```
 
+### 6. Install Cursor (AI-powered code editor)
+
+1. Download from [cursor.com](https://cursor.com)
+2. Open the `.dmg` and drag Cursor to Applications
+3. Open Cursor and sign in (free trial, then $20/mo)
+
+**Why Cursor?** It has AI built right into the editor - no terminal needed. You can:
+- **Cmd+K** - Highlight code, describe what you want changed
+- **Cmd+L** - Open chat panel to ask questions
+- **Cmd+I** - Generate code from a description
+
+### Using Cursor
+
+**Ask questions about your code:**
+1. Press `Cmd+L` to open chat
+2. Type your question: "How do I add a button that saves this material to favorites?"
+3. Cursor will suggest code changes
+
+**Edit code with AI:**
+1. Highlight some code
+2. Press `Cmd+K`
+3. Describe what you want: "Make this button red and add a loading spinner"
+4. Press Enter to apply
+
+**Generate new code:**
+1. Put your cursor where you want new code
+2. Press `Cmd+I`
+3. Describe what you need: "Create a function that filters materials by thickness"
+
+### Cursor Tips
+
+- Be specific in your prompts ("add a search input that filters the materials list by name")
+- If the AI gets confused, try `@file` to reference specific files
+- Use `Cmd+Z` to undo if you don't like a change
+- The chat remembers context, so you can say "now make it also filter by category"
+
 ## Quick Start
 
 ```bash
