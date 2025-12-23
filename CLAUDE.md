@@ -28,6 +28,9 @@ brew install gh
 
 # Fly.io CLI (for deployment)
 brew install flyctl
+
+# Go (needed to build kn)
+brew install go
 ```
 
 ### 3. Configure Git (one time)
@@ -58,6 +61,7 @@ bun --version      # Should print a version number
 git --version      # Should print a version number
 gh --version       # Should print a version number
 fly version        # Should print a version number
+go version         # Should print a version number
 ```
 
 ### 6. Install Cursor (AI-powered code editor)
