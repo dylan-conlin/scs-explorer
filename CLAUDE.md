@@ -2,6 +2,64 @@
 
 A SvelteKit 5 web app for exploring SendCutSend's materials, hardware, and finishes catalog.
 
+## Machine Setup (First Time Only)
+
+If you're setting up a new Mac for development, run these commands in Terminal.
+
+### 1. Install Homebrew (Mac package manager)
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+After it finishes, follow the instructions it prints to add brew to your PATH.
+
+### 2. Install Development Tools
+
+```bash
+# Bun (JavaScript runtime, faster than Node)
+brew install oven-sh/bun/bun
+
+# Git (version control)
+brew install git
+
+# GitHub CLI (for pushing to GitHub)
+brew install gh
+
+# Fly.io CLI (for deployment)
+brew install flyctl
+```
+
+### 3. Configure Git (one time)
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+### 4. Login to GitHub
+
+```bash
+gh auth login
+```
+
+Follow the prompts - it will open a browser to authenticate.
+
+### 5. Login to Fly.io (when ready to deploy)
+
+```bash
+fly auth login
+```
+
+### Verify Everything Works
+
+```bash
+bun --version      # Should print a version number
+git --version      # Should print a version number
+gh --version       # Should print a version number
+fly version        # Should print a version number
+```
+
 ## Quick Start
 
 ```bash
