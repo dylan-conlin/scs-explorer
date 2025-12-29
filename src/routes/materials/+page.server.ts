@@ -1,7 +1,7 @@
 import { getMaterials } from '$lib/scs-api';
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch }) => {
 	const materials = await getMaterials({ fetch });
 	return { materials };
 };
