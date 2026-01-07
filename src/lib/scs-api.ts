@@ -31,6 +31,7 @@ export interface Material {
 	priority?: number;
 	width?: string;
 	height?: string;
+	operations: Array<{ operation: string; public: boolean; [key: string]: any }>; // Available services with configs
 	marketing: {
 		learn_more_url: string;
 		example_image_url: string;
@@ -71,6 +72,7 @@ export interface Hardware {
 	preview_url_full: string;
 	preview_url_tech: string;
 	descriptions: HardwareDescription[];
+	material_configurations: number[]; // Material IDs this hardware is compatible with
 }
 
 export interface HardwareDescription {

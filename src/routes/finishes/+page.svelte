@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
-	import { getFinishTypes, type FinishOption } from '$lib/scs-api';
+	import { getFinishTypes, type FinishOption, type Material } from '$lib/scs-api';
 
 	interface Props {
 		data: {
 			finishes: FinishOption[];
+			materials: Material[];
 		};
 	}
 
@@ -13,14 +14,61 @@
 
 	// Filter state
 	let selectedType = $state<string>('');
+	let selectedMaterial = $state<string>('');
+
+	// Map finish_type to operation name
+	function finishTypeToOperation(finishType: string): string {
+		const mapping: Record<string, string> = {
+			'anodizing': 'anodizing',
+			'powder': 'powder',
+			'plating': 'plating',
+			'powder_coating': 'powder'
+		};
+		return mapping[finishType] || finishType;
+	}
 
 	// Derived values
 	let finishTypes = $derived(getFinishTypes(data.finishes));
-	
+
+	// Get available finish operations from the finishes data
+	let availableFinishOperations = $derived.by(() => {
+		const operations = new Set<string>();
+		data.finishes.forEach(f => {
+			if (f.public && !f.deleted) {
+				operations.add(finishTypeToOperation(f.finish_type));
+			}
+		});
+		return operations;
+	});
+
+	// Get unique material names (specific types like "5052 H32 Aluminum", "6061 T6 Aluminum")
+	let materialTypes = $derived.by(() => {
+		const typeSet = new Set<string>();
+		data.materials.forEach(m => {
+			// Only include materials that have at least one public finish operation
+			const hasPublicFinish = m.operations.some(op =>
+				op.public && availableFinishOperations.has(op.operation)
+			);
+			if (hasPublicFinish) {
+				typeSet.add(m.name);
+			}
+		});
+		return Array.from(typeSet).sort();
+	});
+
+	// Check if a finish is available for a given material type
+	function isFinishAvailableForMaterial(finish: FinishOption, materialName: string): boolean {
+		const operation = finishTypeToOperation(finish.finish_type);
+		return data.materials.some(m =>
+			m.name === materialName && m.operations.some(op => op.public && op.operation === operation)
+		);
+	}
+
 	let filteredFinishes = $derived(
 		data.finishes.filter(f => {
 			if (!f.public || f.deleted) return false;
 			if (selectedType && f.finish_type !== selectedType) return false;
+			if (selectedMaterial && !isFinishAvailableForMaterial(f, selectedMaterial)) return false;
 			return true;
 		})
 	);
@@ -42,7 +90,8 @@
 
 	<main class="container mx-auto px-4 py-8">
 		<!-- Filters -->
-		<div class="mb-8 flex flex-wrap gap-4 items-center">
+		<div class="sticky top-0 z-10 bg-background pb-4 mb-4 border-b">
+			<div class="flex flex-wrap gap-4 items-center pt-4">
 			<select
 				bind:value={selectedType}
 				class="rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -53,15 +102,29 @@
 				{/each}
 			</select>
 
-			{#if selectedType}
-				<Button 
-					variant="ghost" 
+			<select
+				bind:value={selectedMaterial}
+				class="rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+			>
+				<option value="">All Materials</option>
+				{#each materialTypes as material}
+					<option value={material}>{material}</option>
+				{/each}
+			</select>
+
+			{#if selectedType || selectedMaterial}
+				<Button
+					variant="ghost"
 					size="sm"
-					onclick={() => selectedType = ''}
+					onclick={() => {
+						selectedType = '';
+						selectedMaterial = '';
+					}}
 				>
-					Clear Filter
+					Clear Filters
 				</Button>
 			{/if}
+			</div>
 		</div>
 
 		<!-- Finishes Grid -->
@@ -106,9 +169,12 @@
 
 		{#if filteredFinishes.length === 0}
 			<div class="text-center py-12">
-				<p class="text-muted-foreground">No finishes match your filter.</p>
-				<Button variant="outline" class="mt-4" onclick={() => selectedType = ''}>
-					Clear Filter
+				<p class="text-muted-foreground">No finishes match your filters.</p>
+				<Button variant="outline" class="mt-4" onclick={() => {
+					selectedType = '';
+					selectedMaterial = '';
+				}}>
+					Clear Filters
 				</Button>
 			</div>
 		{/if}

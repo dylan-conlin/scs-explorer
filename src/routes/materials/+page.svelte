@@ -47,7 +47,8 @@
 
 	<main class="container mx-auto px-4 py-8">
 		<!-- Filters -->
-		<div class="mb-8 flex flex-wrap gap-4 items-center">
+		<div class="sticky top-0 z-10 bg-background pb-4 mb-4 border-b">
+			<div class="flex flex-wrap gap-4 items-center pt-4">
 			<input
 				type="text"
 				placeholder="Search materials..."
@@ -94,6 +95,7 @@
 					Clear Filters
 				</Button>
 			{/if}
+			</div>
 		</div>
 
 		<!-- Materials Grid -->

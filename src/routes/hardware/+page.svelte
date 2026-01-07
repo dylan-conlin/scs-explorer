@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
-	import { getHardwareCategories, type Hardware } from '$lib/scs-api';
+	import { getHardwareCategories, type Hardware, type Material } from '$lib/scs-api';
 
 	interface Props {
 		data: {
 			hardware: Hardware[];
+			materials: Material[];
 		};
 	}
 
@@ -13,15 +14,49 @@
 
 	// Filter state
 	let selectedCategory = $state<string>('');
+	let selectedMaterial = $state<string>('');
+	let selectedThreadType = $state<string>(''); // 'metric' | 'imperial' | ''
 	let searchQuery = $state('');
 	let showInStockOnly = $state(false);
 
 	// Derived values
 	let categories = $derived(getHardwareCategories(data.hardware));
+
+	// Get material types that support hardware installation
+	let materialTypes = $derived.by(() => {
+		const typeSet = new Set<string>();
+		data.materials.forEach(m => {
+			// Only include materials that have public hardware operation
+			const supportsHardware = m.operations.some(op =>
+				op.public && op.operation === 'hardware'
+			);
+			if (supportsHardware) {
+				typeSet.add(m.name);
+			}
+		});
+		return Array.from(typeSet).sort();
+	});
 	
 	let filteredHardware = $derived(
 		data.hardware.filter(h => {
 			if (selectedCategory && h.category !== selectedCategory) return false;
+			// Material filter: check if hardware is compatible with selected material
+			if (selectedMaterial) {
+				// Find all material IDs that match the selected material name
+				const compatibleMaterialIds = data.materials
+					.filter(m => m.name === selectedMaterial)
+					.map(m => m.id);
+
+				// Check if hardware's material_configurations includes any of these IDs
+				const isCompatible = compatibleMaterialIds.some(id =>
+					h.material_configurations.includes(id)
+				);
+				if (!isCompatible) return false;
+			}
+			if (selectedThreadType) {
+				const threadType = getThreadType(h);
+				if (threadType !== selectedThreadType) return false;
+			}
 			if (showInStockOnly && h.out_of_stock) return false;
 			if (searchQuery) {
 				const search = searchQuery.toLowerCase();
@@ -34,6 +69,19 @@
 
 	function getDescription(hw: Hardware, field: string): string | null {
 		return hw.descriptions.find(d => d.field === field)?.value ?? null;
+	}
+
+	function getThreadType(hw: Hardware): 'metric' | 'imperial' | 'unknown' {
+		const threadSize = getDescription(hw, 'Thread Size');
+		if (!threadSize) return 'unknown';
+
+		// Metric threads start with M (e.g., M2.5, M5, M10)
+		if (threadSize.trim().toUpperCase().startsWith('M')) {
+			return 'metric';
+		}
+
+		// Imperial threads typically use # or fractions (e.g., #6, 1/4", 1/2-13)
+		return 'imperial';
 	}
 </script>
 
@@ -53,7 +101,8 @@
 
 	<main class="container mx-auto px-4 py-8">
 		<!-- Filters -->
-		<div class="mb-8 flex flex-wrap gap-4 items-center">
+		<div class="sticky top-0 z-10 bg-background pb-4 mb-4 border-b">
+			<div class="flex flex-wrap gap-4 items-center pt-4">
 			<input
 				type="text"
 				placeholder="Search hardware..."
@@ -71,17 +120,38 @@
 				{/each}
 			</select>
 
+			<select
+				bind:value={selectedMaterial}
+				class="rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+			>
+				<option value="">All Materials</option>
+				{#each materialTypes as material}
+					<option value={material}>{material}</option>
+				{/each}
+			</select>
+
+			<select
+				bind:value={selectedThreadType}
+				class="rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+			>
+				<option value="">All Thread Types</option>
+				<option value="metric">Metric</option>
+				<option value="imperial">Imperial</option>
+			</select>
+
 			<label class="flex items-center gap-2 text-sm">
 				<input type="checkbox" bind:checked={showInStockOnly} class="rounded" />
 				In Stock Only
 			</label>
 
-			{#if selectedCategory || searchQuery || showInStockOnly}
-				<Button 
-					variant="ghost" 
+			{#if selectedCategory || selectedMaterial || selectedThreadType || searchQuery || showInStockOnly}
+				<Button
+					variant="ghost"
 					size="sm"
 					onclick={() => {
 						selectedCategory = '';
+						selectedMaterial = '';
+						selectedThreadType = '';
 						searchQuery = '';
 						showInStockOnly = false;
 					}}
@@ -89,6 +159,7 @@
 					Clear Filters
 				</Button>
 			{/if}
+			</div>
 		</div>
 
 		<!-- Hardware Grid -->
@@ -143,6 +214,8 @@
 				<p class="text-muted-foreground">No hardware matches your filters.</p>
 				<Button variant="outline" class="mt-4" onclick={() => {
 					selectedCategory = '';
+					selectedMaterial = '';
+					selectedThreadType = '';
 					searchQuery = '';
 					showInStockOnly = false;
 				}}>
